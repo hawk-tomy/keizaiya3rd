@@ -28,7 +28,7 @@ def connection(func):
         if check is None:
             return jsonify({'status':'token is not found'}),400
         elif not check:
-            return jsonify({'status':'token is not alived'}),418
+            return jsonify({'status':'token is not alive'}),418
         else:
             return func()
     return func2
