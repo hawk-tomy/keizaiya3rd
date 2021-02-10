@@ -1,16 +1,42 @@
 
 class user():
     def __new__(self):
-        self._index = (,)
-        self._default = (,)
+        self.__index = (,)
+        self.__default = (,)
 
-    def __init__(self,*args,*,**kwargs):
-        if (a_l := len(args)) > (i_l := len(self._index)):
+    def __init__(self, *args, **kwargs):
+        if (i_l := len(self.__index)) != len(self.__default):
+            raise ValueError('index length is not equal default length')
+        if (a_l := len(args)) > i_l:
             raise ValueError('args is longer than index')
         if len(kwargs) > i_l:
             raise ValueError('kwargs is longer than index')
-        args += self._default[-(a_l - i_l):]
-        for k,v in kwargs.items:
-            if k in self._index:
-                i = self._index.index(k)
+        if a_l != i_l:
+            args += self.__default[a_l - i_l:]
+        for k,v in kwargs.items():
+            if k in self.__index:
+                i = self.__index.index(k)
                 args[i] = v
+        self.__data = args
+
+    def __getitem__(self, key):
+        if isinstance(key, (int,slice)):
+            return self.__data[key]
+        elif isinstance(key, str):
+            if key in (i := self.__index):
+                return self.__data[i.index(key)]
+            else:
+                KeyError(f'this key : ({key}) is not found.')
+        else:
+            raise TypeError(f'this key : ({key})  is not supported.')
+
+    def __setitem__(self, key, value):
+        if isinstance(key, (int,slice)):
+            self.__data[key] = value
+        elif isinstance(key, str):
+            if key in (i := self.__index):
+                self.__data[i.index(key)] value
+            else:
+                KeyError(f'this key : ({key}) is not found.')
+        else:
+            raise TypeError(f'this class: ({type(key)})  is not supported.')
