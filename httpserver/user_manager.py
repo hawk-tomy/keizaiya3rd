@@ -26,17 +26,24 @@ class user():
             if key in (i := self.__index):
                 return self.__data[i.index(key)]
             else:
-                KeyError(f'this key : ({key}) is not found.')
+                raise KeyError(f'this key : ({key}) is not found.')
         else:
             raise TypeError(f'this key : ({key})  is not supported.')
 
     def __setitem__(self, key, value):
         if isinstance(key, (int,slice)):
-            self.__data[key] = value
+            temp = [None*len(self.__data)]
+            temp[key] = value
+            if (t := len(temp)) != (d := len(self.__data)):
+                raise ValueError(('this value is '
+                                 f'{"longer" if t>d else "shorter"}'
+                                  ' you can not change length'))
+            else:
+                self.__data[key] = value
         elif isinstance(key, str):
             if key in (i := self.__index):
                 self.__data[i.index(key)] value
             else:
-                KeyError(f'this key : ({key}) is not found.')
+                raise KeyError(f'this key : ({key}) is not found.')
         else:
             raise TypeError(f'this class: ({type(key)})  is not supported.')
