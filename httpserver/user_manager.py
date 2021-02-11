@@ -42,3 +42,6 @@ class user():
 
     def __bool__(self):
             return bool(self.__data)
+
+    def __contains__(self, item):
+        return item in self.__index
