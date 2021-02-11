@@ -38,10 +38,10 @@ class user():
             raise TypeError(f'this class: ({type(key)})  is not supported.')
 
     def __len__(self):
-            return len(self.__index)
+        return len(self.__index)
 
     def __bool__(self):
-            return bool(self.__data)
+        return bool(self.__data)
 
     def __contains__(self, item):
         return item in self.__index
