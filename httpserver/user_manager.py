@@ -47,3 +47,9 @@ class user():
                 raise KeyError(f'this key : ({key}) is not found.')
         else:
             raise TypeError(f'this class: ({type(key)})  is not supported.')
+
+    def __len__(self):
+            return len(self.__index)
+
+    def __bool__(self):
+            return bool(self.__data)
