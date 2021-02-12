@@ -45,3 +45,15 @@ class user():
 
     def __contains__(self, item):
         return item in self.__index
+
+    @property
+    def get_index(self):
+        return self.__index
+
+    @property
+    def get_default(self):
+        return self.__defalut
+
+    @property
+    def get_data(self):
+        return self.__data
