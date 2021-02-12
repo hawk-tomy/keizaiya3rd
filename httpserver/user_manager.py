@@ -26,7 +26,7 @@ class user():
             else:
                 raise KeyError(f'this key : ({key}) is not found.')
         else:
-            raise TypeError(f'this key : ({key})  is not supported.')
+            raise TypeError(f'this class : ({type(key)})  is not supported.')
 
     def __setitem__(self, key, value):
         if isinstance(key, str):
