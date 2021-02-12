@@ -19,6 +19,16 @@ class user():
                 args[i] = v
         self.__data = args
 
+    def __repr__(self):
+        index = self.__index
+        default = self.__default
+        data = self.__data
+        indexs_list = [f'{e}: ({default[i]}, {data[i]})'
+                for e, i in emulate(index)]
+        return (f'<class name: {self.__name__}, '
+                f'(index:(default,data)): {", ".join(index_list)}')
+
+
     def __getitem__(self, key):
         if isinstance(key, str):
             if key in (i := self.__index):
