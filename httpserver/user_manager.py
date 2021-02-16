@@ -26,7 +26,7 @@ class user():
         indexs_list = [f'{e}: ({default[i]}, {data[i]})'
                 for e, i in emulate(index)]
         return (f'<class name: {self.__name__}, '
-                f'(index:(default,data)): {", ".join(index_list)}')
+                f'(index:(default,data)): {", ".join(index_list)}>')
 
 
     def __getitem__(self, key):
@@ -66,4 +66,15 @@ class user():
 
     @property
     def get_data(self):
-        return self.__data
+        return tuple(self.__data)
+
+class manager():
+    def __init__(self,ul):
+        if type(ul) is tuple:
+            self.__users = [user(u) for u in ul if type(u) is list]
+        else:
+            raise ValueError('"ul" is not list')
+
+    def __repr__(self):
+        return (f'<class name: {self.__name__}, '
+                f'users:({", ".join(self.__users)})>')
