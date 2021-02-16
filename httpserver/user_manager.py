@@ -1,8 +1,7 @@
 
 class user():
-    def __new__(self):
-        self.__index = (,)
-        self.__default = (,)
+    __index = (,)
+    __default = (,)
 
     def __init__(self, *args, **kwargs):
         if (i_l := len(self.__index)) != len(self.__default):
@@ -57,12 +56,14 @@ class user():
         return item in self.__index
 
     @property
-    def get_index(self):
-        return self.__index
+    @classmethod
+    def get_index(cls):
+        return cls.__index
 
     @property
-    def get_default(self):
-        return self.__defalut
+    @classmethod
+    def get_default(cls):
+        return cls.__defalut
 
     @property
     def get_data(self):
@@ -78,3 +79,8 @@ class manager():
     def __repr__(self):
         return (f'<class name: {self.__name__},\n    '
                 f'users:(\n{" "*4}{",\n        ".join(repr(self.__users))})\n>')
+
+    def __getitem__(self,key):
+        if key in user.get_index:
+            pass
+        
