@@ -76,5 +76,5 @@ class manager():
             raise ValueError('"ul" is not list')
 
     def __repr__(self):
-        return (f'<class name: {self.__name__}, '
-                f'users:({", ".join(self.__users)})>')
+        return (f'<class name: {self.__name__},\n    '
+                f'users:(\n{" "*4}{",\n        ".join(repr(self.__users))})\n>')
