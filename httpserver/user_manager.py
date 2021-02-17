@@ -104,4 +104,7 @@ class manager():
         return len(self.__users)
 
     def __contains__(self, item):
-        pass #(search 'name)return item in [u['name'] for u in self.__users]
+        if (t := type(item)) is user:
+            return item in self.__users
+        elif t is str:
+            pass #(search 'name')return item in [u['name'] for u in self.__users]
