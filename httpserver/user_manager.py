@@ -95,3 +95,10 @@ class manager():
                 return [u for u in self.__users if u[key[0]] == key[1]][0][key[2]]
         else:
             raise TypeError(f'this class : ({type(key)})  is not supported.')
+
+    def __setitem__(self,key,item):
+        if type(key) is tuple:
+            if len(key) == 3:
+                return [u for u in self.__users if u[key[0]] == key[1]][0][key[2]] = item
+        else:
+            raise TypeError(f'this class : ({type(key)})  is not supported.')
