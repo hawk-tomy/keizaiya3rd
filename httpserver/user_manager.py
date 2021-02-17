@@ -87,9 +87,11 @@ class manager():
             else:
                 raise KeyError(f'this key : ({key}) is not found.')
         elif type(key) is tuple:
-            if len(key) == 1:
+            if (l := len(key)) == 1:
                 pass #(search 'name')return [u for u in self.__users if u['name'] == key][0]
-            elif len(key) == 2:
+            elif l == 2:
                 return [u for u in self.__users if u[key[0]] == key[1]][0]
+            elif l == 3:
+                return [u for u in self.__users if u[key[0]] == key[1]][0][key[2]]
         else:
             raise TypeError(f'this class : ({type(key)})  is not supported.')
