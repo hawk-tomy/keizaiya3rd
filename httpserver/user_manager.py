@@ -108,3 +108,7 @@ class manager():
             return item in self.__users
         elif t is str:
             pass #(search 'name')return item in [u['name'] for u in self.__users]
+
+    @property
+    def users(self):
+        return self.__users
