@@ -99,3 +99,9 @@ class manager():
                 return [u for u in self.__users if u[key[0]] == key[1]][0][key[2]] = item
         else:
             raise TypeError(f'this class : ({type(key)})  is not supported.')
+
+    def __len__(self):
+        return len(self.__users)
+
+    def __contains__(self, item):
+        pass #(search 'name)return item in [u['name'] for u in self.__users]
