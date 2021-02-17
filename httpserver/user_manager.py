@@ -111,4 +111,4 @@ class manager():
 
     @property
     def users(self):
-        return self.__users
+        return tuple(self.__users)
