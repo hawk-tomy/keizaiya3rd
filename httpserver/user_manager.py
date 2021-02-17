@@ -81,6 +81,15 @@ class manager():
                 f'users:(\n{" "*4}{",\n        ".join(repr(self.__users))})\n>')
 
     def __getitem__(self,key):
-        if key in user.get_index:
-            pass
-        
+        if type(key) is str:
+            if key in user.get_index:
+                return {e[key]: e for e in self.__users}
+            else:
+                raise KeyError(f'this key : ({key}) is not found.')
+        elif type(key) is tuple:
+            if len(key) == 1:
+                pass #(search 'name')return [n for u in self.__users if (n := u['name']) == key][0]
+            elif len(key) == 2:
+                return [u for u in self.__users if u[key[0]] == key[1]][0]
+        else:
+            raise TypeError(f'this class : ({type(key)})  is not supported.')
