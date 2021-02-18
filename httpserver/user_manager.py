@@ -112,3 +112,6 @@ class manager():
     @property
     def users(self):
         return tuple(self.__users)
+
+    def toSerialize(self):
+        return tuple([u.get_data for u in self.__users])
