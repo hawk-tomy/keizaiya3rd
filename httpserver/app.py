@@ -1,17 +1,22 @@
 import uuid
 from datetime import datetime, timedelta
 
+
 from flask import Flask, jsonify, request
 import yaml
 
+
 from user_manager import manager
+
 
 with open('user.yaml')as f:
     userManager = manager(yaml.safe_load(f))
 
+
 def usermanager_close():
     with open('user.yaml','w')as f:
         yaml.dump(userManager,f)
+
 
 def checkToken(token):
     if token is  None or not token in userManager['token'].keys():
@@ -21,6 +26,7 @@ def checkToken(token):
             return False
         else:
             return True
+
 
 def connection(func):
     def func2():
@@ -33,7 +39,9 @@ def connection(func):
             return func()
     return func2
 
+
 app = Flask(__name__)
+
 
 @app.route("/",methods=['GET', 'POST'])
 def login():
@@ -54,10 +62,12 @@ def login():
         return '',418
     return '',404
 
+
 @app.route('/connectionTest/',methods=['POST'])
 @connection
 def connectionTest():
     return jsonify({'status':'success'}),200
+
 
 if __name__ == "__main__":
     app.run(debug=True)

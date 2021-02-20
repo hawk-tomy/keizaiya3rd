@@ -2,6 +2,7 @@ class user():
     __index = ('name', 'password', 'token', 'expiration_date')
     __default = (None, None, None, None)
 
+
     def __init__(self, *args, **kwargs):
         if (i_l := len(self.__index)) != len(self.__default):
             raise ValueError('index length is not equal default length')
@@ -18,6 +19,7 @@ class user():
                 args[i] = v
         self.__data = args
 
+
     def __repr__(self):
         index = self.__index
         default = self.__default
@@ -25,6 +27,7 @@ class user():
         index_list = [f'{e}: ({default[i]}, {data[i]})'
                 for i, e in enumerate(index)]
         return '<user class, (index:(default,data)): 'f'{", ".join(index_list)}>'
+
 
 
     def __getitem__(self, key):
@@ -36,6 +39,7 @@ class user():
         else:
             raise TypeError(f'this class : ({type(key)})  is not supported.')
 
+
     def __setitem__(self, key, value):
         if isinstance(key, str):
             if key in (i := self.__index):
@@ -45,25 +49,31 @@ class user():
         else:
             raise TypeError(f'this class: ({type(key)})  is not supported.')
 
+
     def __len__(self):
         return len(self.__index)
+
 
     def __contains__(self, item):
         return item in self.__index
 
+
     @classmethod
     @property
-    def get_index(cls):
+    def getIndex(cls):
         return cls.__index
 
+
     @classmethod
     @property
-    def get_default(cls):
+    def getDefault(cls):
         return cls.__default
 
+
     @property
-    def get_data(self):
+    def getData(self):
         return tuple(self.__data)
+
 
 class manager():
     def __init__(self,ul):
@@ -72,13 +82,15 @@ class manager():
         else:
             raise ValueError('argument is not list')
 
+
     def __repr__(self):
         users = ['\n  '+repr(u) for u in self.__users]
         return '<manager class, users:('f'{",".join(users)}''\n  )>'
 
+
     def __getitem__(self,key):
         if type(key) is str:
-            if key in user.get_index:
+            if key in user.getIndex:
                 return {e[key]: e for e in self.__users}
             else:
                 raise KeyError(f'this key : ({key}) is not found.')
@@ -106,6 +118,7 @@ class manager():
         else:
             raise TypeError(f'this class : ({type(key)})  is not supported.')
 
+
     def __setitem__(self,key,item):
         if type(key) is tuple:
             if len(key) == 3:
@@ -119,8 +132,10 @@ class manager():
         else:
             raise TypeError(f'this class : ({type(key)})  is not supported.')
 
+
     def __len__(self):
         return len(self.__users)
+
 
     def __contains__(self, item):
         if (t := type(item)) is user:
@@ -128,12 +143,15 @@ class manager():
         elif t is str:
             return item in [u['name'] for u in self.__users]
 
+
     @property
     def users(self):
         return tuple(self.__users)
 
+
     def toSerialize(self):
-        return tuple([u.get_data for u in self.__users])
+        return tuple([u.getData for u in self.__users])
+
 
     def append(self,*args,**kwargs):
         self.__users.append(user(*args,**kwargs))
