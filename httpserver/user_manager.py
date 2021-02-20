@@ -23,9 +23,9 @@ class user():
         default = self.__default
         data = self.__data
         indexs_list = [f'{e}: ({default[i]}, {data[i]})'
-                for e, i in emulate(index)]
+                for e, i in enumerate(index)]
         return (f'<class name: {self.__name__}, '
-                f'(index:(default,data)): {", ".join(index_list)}>')
+                f'(index:(default,data)): {", ".join(indexs_list)}>')
 
 
     def __getitem__(self, key):
