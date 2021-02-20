@@ -1,7 +1,7 @@
 
 class user():
-    __index = (,)
-    __default = (,)
+    __index = ('name', 'password', 'token', 'expiration_date')
+    __default = (None, None, None, None)
 
     def __init__(self, *args, **kwargs):
         if (i_l := len(self.__index)) != len(self.__default):
@@ -74,8 +74,7 @@ class manager():
             raise ValueError('"ul" is not list')
 
     def __repr__(self):
-        return (f'<class name: {self.__name__},\n    '
-                f'users:(\n{" "*4}{",\n        ".join(repr(self.__users))})\n>')
+        return '<manager class users:(\n'+" "*4+",\n        ".join(repr(self.__users))+')\n>'
 
     def __getitem__(self,key):
         if type(key) is str:
