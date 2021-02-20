@@ -58,7 +58,7 @@ class user():
 
     @property
     def get_default(self):
-        return self.__defalut
+        return self.__default
 
     @property
     def get_data(self):
