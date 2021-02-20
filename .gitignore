@@ -1,7 +1,10 @@
 #my ignore list
 token
+test_client.py
 *.yaml
 *.yml
+.vscode
+gevenWS/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
