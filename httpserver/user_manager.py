@@ -53,14 +53,12 @@ class user():
         return item in self.__index
 
     @property
-    @classmethod
-    def get_index(cls):
-        return cls.__index
+    def get_index(self):
+        return self.__index
 
     @property
-    @classmethod
-    def get_default(cls):
-        return cls.__defalut
+    def get_default(self):
+        return self.__defalut
 
     @property
     def get_data(self):
