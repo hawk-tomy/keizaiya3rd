@@ -1,4 +1,3 @@
-
 class user():
     __index = ('name', 'password', 'token', 'expiration_date')
     __default = (None, None, None, None)
@@ -52,13 +51,15 @@ class user():
     def __contains__(self, item):
         return item in self.__index
 
+    @classmethod
     @property
-    def get_index(self):
-        return self.__index
+    def get_index(cls):
+        return cls.__index
 
+    @classmethod
     @property
-    def get_default(self):
-        return self.__default
+    def get_default(cls):
+        return cls.__default
 
     @property
     def get_data(self):
@@ -83,18 +84,38 @@ class manager():
                 raise KeyError(f'this key : ({key}) is not found.')
         elif type(key) is tuple:
             if (l := len(key)) == 1:
-                return [u for u in self.__users if u['name'] == key][0]
+                findeds = [u for u in self.__users if u['name'] == key[0]]
+                if findeds:
+                    return findeds[0]
+                else:
+                    raise KeyError(f'this key 0 : ({key[0]}) is not found.')
             elif l == 2:
-                return [u for u in self.__users if u[key[0]] == key[1]][0]
+                findeds = [u for u in self.__users if u[key[0]] == key[1]]
+                if findeds:
+                    return findeds[0]
+                else:
+                    raise KeyError(f'this key 1 : ({key[1]}) is not found.')
             elif l == 3:
-                return [u for u in self.__users if u[key[0]] == key[1]][0][key[2]]
+                findeds = [u for u in self.__users if u[key[0]] == key[1]]
+                if findeds:
+                    return findeds[0][key[2]]
+                else:
+                    raise KeyError(f'this key 1 : ({key[1]}) is not found.')
+            else:
+                raise ValueError(f'this tuple length : ({len(key)}) is too big.')
         else:
             raise TypeError(f'this class : ({type(key)})  is not supported.')
 
     def __setitem__(self,key,item):
         if type(key) is tuple:
             if len(key) == 3:
-                [u for u in self.__users if u[key[0]] == key[1]][0][key[2]] = item
+                findeds = [u for u in self.__users if u[key[0]] == key[1]]
+                if findeds:
+                    findeds[0][key[2]] = item
+                else:
+                    raise KeyError(f'this key 1 : ({key[1]}) is not found.')
+            else:
+                raise ValueError(f'this tuple length : ({len(key)}) is not 3.')
         else:
             raise TypeError(f'this class : ({type(key)})  is not supported.')
 
