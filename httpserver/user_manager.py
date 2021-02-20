@@ -12,6 +12,7 @@ class user():
             raise ValueError('kwargs is longer than index')
         if a_l != i_l:
             args += self.__default[a_l - i_l:]
+        args = list(args)
         for k,v in kwargs.items():
             if k in self.__index:
                 i = self.__index.index(k)
@@ -22,10 +23,9 @@ class user():
         index = self.__index
         default = self.__default
         data = self.__data
-        indexs_list = [f'{e}: ({default[i]}, {data[i]})'
-                for e, i in enumerate(index)]
-        return (f'<class name: {self.__name__}, '
-                f'(index:(default,data)): {", ".join(indexs_list)}>')
+        index_list = [f'{e}: ({default[i]}, {data[i]})'
+                for i, e in enumerate(index)]
+        return '<user class, (index:(default,data)): 'f'{", ".join(index_list)}>'
 
 
     def __getitem__(self, key):
@@ -68,13 +68,14 @@ class user():
 
 class manager():
     def __init__(self,ul):
-        if type(ul) is tuple:
-            self.__users = [user(u) for u in ul if type(u) is list]
+        if type(ul) is list:
+            self.__users = [user(*u) for u in ul if type(u) is list]
         else:
-            raise ValueError('"ul" is not list')
+            raise ValueError('argument is not list')
 
     def __repr__(self):
-        return '<manager class users:(\n'+" "*4+",\n        ".join(repr(self.__users))+')\n>'
+        users = ['\n  '+repr(u) for u in self.__users]
+        return '<manager class, users:('f'{",".join(users)}''\n  )>'
 
     def __getitem__(self,key):
         if type(key) is str:
