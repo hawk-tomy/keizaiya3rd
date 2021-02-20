@@ -134,3 +134,6 @@ class manager():
 
     def toSerialize(self):
         return tuple([u.get_data for u in self.__users])
+
+    def append(self,*args,**kwargs):
+        self.__users.append(user(*args,**kwargs))
