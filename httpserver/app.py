@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.9
 from uuid import uuid4
 
 
@@ -81,7 +81,7 @@ class b2p():
                 emit(self.event,
                     {
                         'status': 'error',
-                        'message': 'this plugin is not online'
+                        'message': 'this destination is not online'
                         })
 
 
@@ -140,7 +140,7 @@ def login(json):
             bots = users.find_notice(user['name'])
             for bot in bots:
                 if bot['connected']:
-                    socketio.emit('plugin_login',json,user['name'],to=bot['sid'])
+                    socketio.emit('plugin_login',user['name'],to=bot['sid'])
         else:
             emit('login_result', {'status':'error', 'message':'Bad Password'})
             flask_socketio.disconnect()

@@ -5,7 +5,6 @@ token
 *.yml
 .vscode
 !event_list.yaml
-!user.yaml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
