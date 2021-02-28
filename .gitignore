@@ -1,6 +1,6 @@
 #my ignore list
 token
-test_client.py
+*client*.py
 *.yaml
 *.yml
 .vscode

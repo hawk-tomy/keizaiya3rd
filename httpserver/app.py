@@ -1,73 +1,171 @@
-import uuid
-from datetime import datetime, timedelta
+#!/usr/bin/env python
+from uuid import uuid4
 
 
-from flask import Flask, jsonify, request
+from flask import Flask, request
+from flask_socketio import SocketIO, emit, send
+import flask_socketio
 import yaml
 
 
-from user_manager import manager
+from util import getLogger, manager
+
+
+async_mode = "gevent"
+app = Flask(__name__)
+app.config['SECRET_KEY'] = str(uuid4())
+
+
+logger = getLogger('server',saveName='server.log')
+slogger = logger.getChild('sIO')
+elogger = logger.getChild('eIO')
+
+
+socketio = SocketIO(
+        app,
+        logger=slogger,
+        engineio_logger=elogger,
+        async_mode=async_mode,
+        ping_interval=60
+        )
+
+
+with open('event_list.yaml')as f:
+    event_dict = yaml.safe_load(f)
 
 
 with open('user.yaml')as f:
-    userManager = manager(yaml.safe_load(f))
+    users = manager(yaml.safe_load(f))
 
 
-def usermanager_close():
+def close_user():
     with open('user.yaml','w')as f:
-        yaml.dump(userManager,f)
+        yaml.dump(users.toSerialize(),f,canonical=False)
+close_user()
 
 
-def checkToken(token):
-    if token is  None or not token in userManager['token'].keys():
-        return None
+class p2b():
+    def __init__(self,event):
+        self.event = event
+
+    def __call__(self,json):
+        sid = request.sid
+        if users['sid', sid, 'type'] != 'plugin':
+            return
+        sender = users['sid', sid, 'name']
+        bots = users.find_notice(sender)
+        for bot in bots:
+            if bot['connected']:
+                socketio.emit(self.event,json,sender,to=bot['sid'])
+
+
+class b2p():
+    def __init__(self,event):
+        self.event = event
+
+    def __call__(self,json):
+            to = json.pop('to',None)
+            if to is None or users[to,] is None:
+                emit(self.event,
+                    {
+                        'status': 'error',
+                        'message': 'key "to" is not found in this json'
+                        })
+                return
+            to_user = users[to,]
+            if to_user['connected']:
+                to_sid = to_user['sid']
+                json['to'] = users['sid', request.sid, 'name']
+                socketio.emit(self.event, json, to=to_sid)
+            else:
+                emit(self.event,
+                    {
+                        'status': 'error',
+                        'message': 'this plugin is not online'
+                        })
+
+
+def event_receiver(event):
+    event_type = event_dict.get(event)
+    if event_type == 'p2b':
+        handler = p2b(event)
+    elif event_type == 'b2p':
+        handler = b2p(event)
     else:
-        if userManager['token', token, 'expiration_date'] < datetime.now():
-            return False
+        raise ValueError(f'this event {event} is not found')
+    return handler
+[socketio.on_event(e,event_receiver(e)) for e in event_dict]
+
+
+@socketio.event
+def notice(json):
+    user = users['sid', request.sid]
+    if user['type'] in ('bot',):
+        if json['name'] not in (u['name'] for u in users.users):
+            emit('notice',
+                    {'status':'error','message':'this user is not found'})
+        elif users['name', json['name'], 'type'] == 'plugin':
+            user.append('notice',json['name'])
+            close_user()
+            emit('notice',{'status':'success', 'message':'success'})
         else:
-            return True
+            emit('notice',
+                    {'status':'error','message':'this user is not plugin'})
+    else:
+        emit('notice',
+                {'status':'error','message':'this event is BOT only'})
 
 
-def connection(func):
-    def func2():
-        check = checkToken(request.form.get('token'))
-        if check is None:
-            return jsonify({'status':'token is not found'}),400
-        elif not check:
-            return jsonify({'status':'token is not alive'}),418
+@socketio.event
+def get_notice():
+    user = users['sid', request.sid]
+    emit('get_notice',{'notices':user['notice']})
+
+
+@socketio.event
+def login(json):
+    try:
+        print(users)
+        password = users['name', json['name'], 'password']
+    except KeyError:
+        emit('login_result', {'status':'error', 'message':'Bad Name'})
+        flask_socketio.disconnect()
+    else:
+        if password == json['password']:
+            emit('login_result', {'status':'success', 'message':'success'})
+            user = users[json['name'],]
+            user['sid'] = request.sid
+            user['connected'] = True
+            close_user()
+            bots = users.find_notice(user['name'])
+            for bot in bots:
+                if bot['connected']:
+                    socketio.emit('plugin_login',json,user['name'],to=bot['sid'])
         else:
-            return func()
-    return func2
+            emit('login_result', {'status':'error', 'message':'Bad Password'})
+            flask_socketio.disconnect()
 
 
-app = Flask(__name__)
+@socketio.event
+def connect():
+    logger.info(f'{request.sid} is connected')
+    socketio.sleep(1)
+    emit('message','your connection.pls wait login event')
+    emit('login',{'status':'notice','message':'please login'})
 
 
-@app.route("/",methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        name = request.form.get('username')
-        if name is not None:
-            password = userManager['name', name,'password']
-        else:
-            return '',400
-        if password == request.form.get('password'):
-            token = str(uuid.uuid4())
-            while token in userManager['token']:
-                token = str(uuid.uuid4())
-            userManager['name', name, 'token'] = token
-            userManager['name', name, 'expiration_date'] = datetime.now()+timedelta(minutes=1)
-            usermanager_close()
-            return jsonify({"token": token})
-        return '',418
-    return '',404
+@socketio.event
+def disconnect():
+    logger.info(f'{request.sid} is disconnected')
+    try:
+        user = users['sid',request.sid]
+    except KeyError:
+        pass
+    else:
+        user['sid'] = None
+        user['connected'] = False
+        close_user()
 
 
-@app.route('/connectionTest/',methods=['POST'])
-@connection
-def connectionTest():
-    return jsonify({'status':'success'}),200
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    socketio.run(app,debug=True)
