@@ -4,7 +4,8 @@ token
 *.yaml
 *.yml
 .vscode
-gevenWS/
+!event_list.yaml
+!user.yaml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
