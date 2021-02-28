@@ -1,6 +1,48 @@
+import logging
+
+
+def getLogger(name, level= logging.DEBUG, saveName= None,):
+    #フォーマットの定義
+    formatter = logging.Formatter('{asctime};{name};{levelname};{message}',style='{')
+    #ロガーの定義
+    def_logger = logging.getLogger(name)
+    def_logger.setLevel(level)
+    if saveName is not None:
+        #ファイル書き込み用
+        fh = logging.FileHandler(saveName, encoding='utf-8')
+        fh.setFormatter(formatter)
+        fh.setLevel(logging.NOTSET)
+        def_logger.addHandler(fh)
+    if not '.' in name:
+        #最上位ロガー専用
+        warningSaveName = 'warning_' + saveName if saveName is not None else 'warning_main.log'
+        fhw = logging.FileHandler(warningSaveName, encoding='utf-8')
+        fhw.setFormatter(formatter)
+        fhw.setLevel(logging.WARNING)
+        #コンソール出力用
+        sh = logging.StreamHandler()
+        sh.setFormatter(formatter)
+        sh.setLevel(logging.NOTSET)
+        #それぞれロガーに追加
+        def_logger.addHandler(sh)
+        def_logger.addHandler(fhw)
+    #return def_logger
+    return def_logger
+
+
 class user():
-    __index = ('name', 'password', 'token', 'expiration_date')
-    __default = (None, None, None, None)
+    __map =  (
+        ('name', None),
+        ('password', None),
+        ('type', None),
+        ('notice', tuple()),
+        ('sid', None),
+        ('connected', False),
+        ('list', tuple()),
+        #list is (eventname, data, name) or (eventname, data, name, request_id)
+        )
+    __index = tuple(map(lambda e: e[0], __map))
+    __default = tuple(map(lambda e: e[1], __map))
 
 
     def __init__(self, *args, **kwargs):
@@ -75,10 +117,25 @@ class user():
         return tuple(self.__data)
 
 
+    def getMap(self):
+        return {k:(list(e) if isinstance(e,tuple) else e)
+                for k,e
+                    in zip(self.__index,self.__data)}
+
+
+    def append(self,key,value):
+        if key not in ('notice','list'):
+            raise KeyError('this key is not found')
+        i = self.__index.index(key)
+        data = list(self.__data[i])
+        data.append(value)
+        self.__data[i] = tuple(data)
+
+
 class manager():
     def __init__(self,ul):
         if type(ul) is list:
-            self.__users = [user(*u) for u in ul if type(u) is list]
+            self.__users = [user(**u) for u in ul if type(u) is dict]
         else:
             raise ValueError('argument is not list')
 
@@ -150,8 +207,18 @@ class manager():
 
 
     def toSerialize(self):
-        return tuple([u.getData for u in self.__users])
+        return [u.getMap() for u in self.__users]
 
 
     def append(self,*args,**kwargs):
         self.__users.append(user(*args,**kwargs))
+
+
+    def find_notice(self,name):
+        users = []
+        for user in self.__users:
+            if not user['connected'] or user['type'] != 'bot':
+                continue
+            if name in user['notice']:
+                users.append(user)
+        return users
